@@ -1,0 +1,141 @@
+{
+	"name": "CopyPipeline_viu",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_viu",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "conc7a/Medical/Dataset A.csv"
+					},
+					{
+						"name": "Destination",
+						"value": "dbo.tblMedicalData"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": false,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"skipLineCount": 0
+						}
+					},
+					"sink": {
+						"type": "SqlPoolSink",
+						"allowPolyBase": true,
+						"polyBaseSettings": {
+							"rejectValue": 0,
+							"rejectType": "value",
+							"useTypeDefault": true
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Patient id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Patient id",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Employee Name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Employee Name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "gender",
+									"type": "String"
+								},
+								"sink": {
+									"name": "gender",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "dob",
+									"type": "String"
+								},
+								"sink": {
+									"name": "dob",
+									"type": "Date"
+								}
+							},
+							{
+								"source": {
+									"name": "zipcode",
+									"type": "String"
+								},
+								"sink": {
+									"name": "zipcode",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "employment_status",
+									"type": "String"
+								},
+								"sink": {
+									"name": "employment_status",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "education",
+									"type": "String"
+								},
+								"sink": {
+									"name": "education",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_viu",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_viu",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}

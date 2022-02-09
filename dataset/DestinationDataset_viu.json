@@ -85,10 +85,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "tblMedicalData"
-		},
-		"sqlPool": {
-			"referenceName": "c7adedicatedPool",
-			"type": "SqlPoolReference"
 		}
 	}
 }

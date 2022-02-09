@@ -55,8 +55,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "Patient id",
-									"type": "Int64"
+									"name": "Patient_id"
 								}
 							},
 							{
@@ -65,8 +64,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "Employee Name",
-									"type": "String"
+									"name": "Employee_Name"
 								}
 							},
 							{

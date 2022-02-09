@@ -19,13 +19,6 @@
 						"referenceName": "Dataflow1",
 						"type": "DataFlowReference"
 					},
-					"staging": {
-						"linkedService": {
-							"referenceName": "asawsmedical-WorkspaceDefaultStorage",
-							"type": "LinkedServiceReference"
-						},
-						"folderPath": "consynapse"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"

@@ -1,9 +1,9 @@
 {
-	"name": "Pipeline 1",
+	"name": "IngestData",
 	"properties": {
 		"activities": [
 			{
-				"name": "Data flow1",
+				"name": "ProcessData",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "Dataflow1",
+						"referenceName": "ProcessData",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -27,12 +27,6 @@
 				}
 			}
 		],
-		"parameters": {
-			"DBName": {
-				"type": "string",
-				"defaultValue": "dbMedical"
-			}
-		},
 		"annotations": []
 	}
 }

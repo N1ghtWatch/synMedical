@@ -2,13 +2,13 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "\n/****** Object:  StoredProcedure [dbo].[uspCreateMedicalTables]    Script Date: 09/02/2022 5:03:10 pm ******/\nSET ANSI_NULLS ON\nGO\n\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE procedure [dbo].[uspCreateMedicalTables]\nas \nBegin \n\tIF Not EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[tblMedicalData]') AND type in (N'U'))\n\tCREATE TABLE [dbo].[tblMedicalData](\n\t\t[Patient id]\t\tbigint\t\t,\n\t\t[Employee Name]\t\tnvarchar(50),\n\t\tgender\t\t\t\tnvarchar(10),\n\t\t[In Military]       nvarchar(12),\n\t\tmilitary_service\tbit\t\t\t,\n\t\tdob\t\t\t\t\tDate\t\t,\n\t\t[Birth Month]       int\t\t\t,\n\t\tzipcode\t\t\t\tbigint\t\t,\n\t\temployment_status\tnvarchar(12),\n\t\teducation\t\t\tnvarchar(12),\n\t\tmarital_status\t\tnvarchar(10),\n\t\tchildren\t\t\tint\t\t\t,\n\t\tancestry\t\t\tnvarchar(25),\n\t\tavg_commute\t\t\tdecimal(8,2),\n\t\tdaily_internet_use\tdecimal(8,2),\n\t\tavailable_vehicles\tint\t\t\t,\n\t\tdisease\t\t\t\tnvarchar(30)\t\t\t\n\t) ON [PRIMARY]\nend\nGO\n\n\n",
+			"query": "\n\tCREATE TABLE [dbo].[tblMedicalData](\n\t\t[Patient id]\t\tbigint\t\t,\n\t\t[Employee Name]\t\tnvarchar(50),\n\t\tgender\t\t\t\tnvarchar(10),\n\t\t[In Military]       nvarchar(12),\n\t\tmilitary_service\tbit\t\t\t,\n\t\tdob\t\t\t\t\tDate\t\t,\n\t\t[Birth Month]       int\t\t\t,\n\t\tzipcode\t\t\t\tbigint\t\t,\n\t\temployment_status\tnvarchar(12),\n\t\teducation\t\t\tnvarchar(12),\n\t\tmarital_status\t\tnvarchar(10),\n\t\tchildren\t\t\tint\t\t\t,\n\t\tancestry\t\t\tnvarchar(25),\n\t\tavg_commute\t\t\tdecimal(8,2),\n\t\tdaily_internet_use\tdecimal(8,2),\n\t\tavailable_vehicles\tint\t\t\t,\n\t\tdisease\t\t\t\tnvarchar(30)\t\t\t\n\t)\n\n",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
 				"databaseName": "master",
-				"poolName": "c7adedicatedPool"
+				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
 		},

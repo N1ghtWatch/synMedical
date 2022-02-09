@@ -10,11 +10,36 @@
 						"type": "DatasetReference"
 					},
 					"name": "DatasetA"
+				},
+				{
+					"dataset": {
+						"referenceName": "dsDatasetB",
+						"type": "DatasetReference"
+					},
+					"name": "DatasetB"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
-			"script": "source(output(\n\t\t{Employee Name} as string,\n\t\tgender as string,\n\t\tdob as string,\n\t\tzipcode as string,\n\t\temployment_status as string,\n\t\teducation as string,\n\t\t{Patient id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetA"
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Join1"
+				},
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Select1"
+				}
+			],
+			"script": "source(output(\n\t\t{Employee Name} as string,\n\t\tgender as string,\n\t\tdob as string,\n\t\tzipcode as string,\n\t\temployment_status as string,\n\t\teducation as string,\n\t\t{Patient id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetA\nsource(output(\n\t\tmarital_status as string,\n\t\tchildren as string,\n\t\tancestry as string,\n\t\tavg_commute as string,\n\t\tdaily_internet_use as string,\n\t\tavailable_vehicles as string,\n\t\tmilitary_service as string,\n\t\tdisease as string,\n\t\t{P. id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetB\nDatasetA, DatasetB join({Patient id} == {P. id},\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nJoin1 derive(dob = toDate(dob,\"dd-MM-yyyy\"),\n\t\t{In Military} = iif(military_service==\"yes\", \"In Military\",\"Non Military\"),\n\t\t{Birth Month} = month(toDate(dob,\"dd-MM-yyyy\"))) ~> DerivedColumn1\nDerivedColumn1 select(mapColumn(\n\t\tEmployee_Name = {Employee Name},\n\t\tgender,\n\t\tdob,\n\t\tzipcode,\n\t\temployment_status,\n\t\teducation,\n\t\tPatient_id = {Patient id},\n\t\tmarital_status,\n\t\tchildren,\n\t\tancestry,\n\t\tavg_commute,\n\t\tdaily_internet_use,\n\t\tavailable_vehicles,\n\t\tmilitary_service,\n\t\tdisease,\n\t\tIn_Military = {In Military},\n\t\tBirth_Month = {Birth Month}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 		}
 	}
 }

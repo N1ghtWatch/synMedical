@@ -5,6 +5,9 @@
 		"workspaceName": {
 			"value": "asawsmedical"
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
 		"asawsmedical-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},

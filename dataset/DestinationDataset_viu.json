@@ -1,0 +1,94 @@
+{
+	"name": "DestinationDataset_viu",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "Patient id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Employee Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "gender",
+				"type": "nvarchar"
+			},
+			{
+				"name": "In Military",
+				"type": "nvarchar"
+			},
+			{
+				"name": "military_service",
+				"type": "bit"
+			},
+			{
+				"name": "dob",
+				"type": "date"
+			},
+			{
+				"name": "Birth Month",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "zipcode",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "employment_status",
+				"type": "nvarchar"
+			},
+			{
+				"name": "education",
+				"type": "nvarchar"
+			},
+			{
+				"name": "marital_status",
+				"type": "nvarchar"
+			},
+			{
+				"name": "children",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ancestry",
+				"type": "nvarchar"
+			},
+			{
+				"name": "avg_commute",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 2
+			},
+			{
+				"name": "daily_internet_use",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 2
+			},
+			{
+				"name": "available_vehicles",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "disease",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tblMedicalData"
+		},
+		"sqlPool": {
+			"referenceName": "c7adedicatedPool",
+			"type": "SqlPoolReference"
+		}
+	}
+}

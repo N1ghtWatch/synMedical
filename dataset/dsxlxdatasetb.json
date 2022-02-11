@@ -1,0 +1,58 @@
+{
+	"name": "dsxlxdatasetb",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "asawsmedical-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Dataset B",
+				"folderPath": "Medical",
+				"fileSystem": "conc7a"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "marital_status",
+				"type": "String"
+			},
+			{
+				"name": "children",
+				"type": "String"
+			},
+			{
+				"name": "ancestry",
+				"type": "String"
+			},
+			{
+				"name": "avg_commute",
+				"type": "String"
+			},
+			{
+				"name": "daily_internet_use",
+				"type": "String"
+			},
+			{
+				"name": "available_vehicles",
+				"type": "String"
+			},
+			{
+				"name": "military_service",
+				"type": "String"
+			},
+			{
+				"name": "disease",
+				"type": "String"
+			},
+			{
+				"name": "P. id",
+				"type": "String"
+			}
+		]
+	}
+}

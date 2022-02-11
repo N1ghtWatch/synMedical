@@ -1,0 +1,17 @@
+{
+	"name": "sqlcreatedatabase",
+	"properties": {
+		"content": {
+			"query": "DROP DATABASE IF EXISTS dbMedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dbMedical",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

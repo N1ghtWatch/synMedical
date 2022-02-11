@@ -5,6 +5,9 @@
 			"referenceName": "asawsmedical-WorkspaceDefaultStorage",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Process Option 1"
+		},
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {

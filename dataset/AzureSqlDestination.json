@@ -5,6 +5,9 @@
 			"referenceName": "AzureSqlDatabase1",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Process Option 1"
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [

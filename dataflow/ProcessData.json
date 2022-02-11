@@ -1,6 +1,9 @@
 {
 	"name": "ProcessData",
 	"properties": {
+		"folder": {
+			"name": "Process Option 1"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

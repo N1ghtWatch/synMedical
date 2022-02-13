@@ -66,10 +66,88 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
+				"folder": {
+					"name": "Process Option 1"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/dataflows/ProcessData')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dsxlxdatasetb",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dscsvdestination",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/dsxlxdatasetb')]",
+				"[concat(variables('workspaceId'), '/datasets/dscsvdestination')]"
 			]
 		},
 		{
@@ -80,6 +158,9 @@
 				"linkedServiceName": {
 					"referenceName": "AzureSqlDatabase1",
 					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Process Option 1"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -180,6 +261,9 @@
 					"referenceName": "asawsmedical-WorkspaceDefaultStorage",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "Process Option 1"
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
@@ -231,6 +315,131 @@
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/dsDatasetB')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "asawsmedical-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Process Option 1"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Dataset B.xlsx",
+						"folderPath": "Medical",
+						"fileSystem": "conc7a"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "marital_status",
+						"type": "String"
+					},
+					{
+						"name": "children",
+						"type": "String"
+					},
+					{
+						"name": "ancestry",
+						"type": "String"
+					},
+					{
+						"name": "avg_commute",
+						"type": "String"
+					},
+					{
+						"name": "daily_internet_use",
+						"type": "String"
+					},
+					{
+						"name": "available_vehicles",
+						"type": "String"
+					},
+					{
+						"name": "military_service",
+						"type": "String"
+					},
+					{
+						"name": "disease",
+						"type": "String"
+					},
+					{
+						"name": "P. id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asawsmedical-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dscsvdestination')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "asawsmedical-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Dataset B.csv",
+						"folderPath": "Medical",
+						"fileSystem": "conc7a"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Employee Name",
+						"type": "String"
+					},
+					{
+						"name": "gender",
+						"type": "String"
+					},
+					{
+						"name": "dob",
+						"type": "String"
+					},
+					{
+						"name": "zipcode",
+						"type": "String"
+					},
+					{
+						"name": "employment_status",
+						"type": "String"
+					},
+					{
+						"name": "education",
+						"type": "String"
+					},
+					{
+						"name": "Patient id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asawsmedical-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dsxlxdatasetb')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -393,6 +602,9 @@
 			"type": "Microsoft.Synapse/workspaces/dataflows",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Process Option 1"
+				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
 					"sources": [
@@ -431,7 +643,7 @@
 							"name": "SelectFinalData"
 						}
 					],
-					"script": "source(output(\n\t\t{Employee Name} as string,\n\t\tgender as string,\n\t\tdob as string,\n\t\tzipcode as string,\n\t\temployment_status as string,\n\t\teducation as string,\n\t\t{Patient id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetA\nsource(output(\n\t\tmarital_status as string,\n\t\tchildren as string,\n\t\tancestry as string,\n\t\tavg_commute as string,\n\t\tdaily_internet_use as string,\n\t\tavailable_vehicles as string,\n\t\tmilitary_service as string,\n\t\tdisease as string,\n\t\t{P. id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetB\nDatasetA, DatasetB join({Patient id} == {P. id},\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinbyPatientID\nJoinbyPatientID derive(dob = toDate(dob,\"dd-MM-yyyy\"),\n\t\t{In Military} = iif(military_service==\"yes\", \"In Military\",\"Non Military\"),\n\t\t{Birth Month} = month(toDate(dob,\"dd-MM-yyyy\"))) ~> DerivedColumn\nDerivedColumn select(mapColumn(\n\t\t{Employee Name},\n\t\tgender,\n\t\tdob,\n\t\tzipcode,\n\t\temployment_status,\n\t\teducation,\n\t\t{Patient id},\n\t\tmarital_status,\n\t\tchildren,\n\t\tancestry,\n\t\tavg_commute,\n\t\tdaily_internet_use,\n\t\tavailable_vehicles,\n\t\tmilitary_service,\n\t\tdisease,\n\t\t{In Military},\n\t\t{Birth Month}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectFinalData\nSelectFinalData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\t{Patient id} as long,\n\t\t{Employee Name} as string,\n\t\tgender as string,\n\t\t{In Military} as string,\n\t\tmilitary_service as boolean,\n\t\tdob as date,\n\t\t{Birth Month} as integer,\n\t\tzipcode as long,\n\t\temployment_status as string,\n\t\teducation as string,\n\t\tmarital_status as string,\n\t\tchildren as integer,\n\t\tancestry as string,\n\t\tavg_commute as decimal(8,2),\n\t\tdaily_internet_use as decimal(8,2),\n\t\tavailable_vehicles as integer,\n\t\tdisease as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinktoAzureSQL"
+					"script": "source(output(\n\t\t{Employee Name} as string,\n\t\tgender as string,\n\t\tdob as string,\n\t\tzipcode as string,\n\t\temployment_status as string,\n\t\teducation as string,\n\t\t{Patient id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetA\nsource(output(\n\t\tmarital_status as string,\n\t\tchildren as string,\n\t\tancestry as string,\n\t\tavg_commute as string,\n\t\tdaily_internet_use as string,\n\t\tavailable_vehicles as string,\n\t\tmilitary_service as string,\n\t\tdisease as string,\n\t\t{P. id} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DatasetB\nDatasetA, DatasetB join({Patient id} == {P. id},\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinbyPatientID\nJoinbyPatientID derive(dob = toDate(dob,\"dd-MM-yyyy\"),\n\t\t{In Military} = iif(military_service==\"yes\", \"In Military\",\"Non Military\"),\n\t\t{Birth Month} = month(toDate(dob,\"dd-MM-yyyy\")),\n\t\tAge = ERROR_FUNCTION('')) ~> DerivedColumn\nDerivedColumn select(mapColumn(\n\t\t{Employee Name},\n\t\tgender,\n\t\tdob,\n\t\tzipcode,\n\t\temployment_status,\n\t\teducation,\n\t\t{Patient id},\n\t\tmarital_status,\n\t\tchildren,\n\t\tancestry,\n\t\tavg_commute,\n\t\tdaily_internet_use,\n\t\tavailable_vehicles,\n\t\tmilitary_service,\n\t\tdisease,\n\t\t{In Military},\n\t\t{Birth Month}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectFinalData\nSelectFinalData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\t{Patient id} as long,\n\t\t{Employee Name} as string,\n\t\tgender as string,\n\t\t{In Military} as string,\n\t\tmilitary_service as boolean,\n\t\tdob as date,\n\t\t{Birth Month} as integer,\n\t\tzipcode as long,\n\t\temployment_status as string,\n\t\teducation as string,\n\t\tmarital_status as string,\n\t\tchildren as integer,\n\t\tancestry as string,\n\t\tavg_commute as decimal(8,2),\n\t\tdaily_internet_use as decimal(8,2),\n\t\tavailable_vehicles as integer,\n\t\tdisease as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinktoAzureSQL"
 				}
 			},
 			"dependsOn": [
@@ -447,6 +659,212 @@
 			"properties": {
 				"type": "ManagedIdentity",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlcreatedatabase')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "DROP DATABASE IF EXISTS dbMedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dbMedical",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlcreateviewdataseta')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nCREATE VIEW DatasetA AS (\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/Medical/Dataset A.csv',\n        FORMAT = 'CSV',\n        HEADER_ROW=true,\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n)",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlcreateviewdatasetb')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nCREATE VIEW DatasetA AS (\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/Medical/Dataset b.csv',\n        FORMAT = 'CSV',\n        HEADER_ROW=true,\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n)",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqldropmedicaldatabase')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "Use dbMedical\nGO\n\nDROP EXTERNAL DATA SOURCE AzureOpenData\nGO\n\nUse MASTER\nGO\n\nDROP DATABASE dbMedical\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "spMedical",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "06ef3566-79f1-444e-b6a9-c173fc647cac"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "sql"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
+						"name": "spMedical",
+						"type": "Spark",
+						"endpoint": "https://asawsmedical.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spMedical",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"dfa = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset A.csv', format='csv'\r\n",
+							"## If header exists uncomment line below\r\n",
+							", header=True\r\n",
+							")\r\n",
+							"\r\n",
+							"dfa.createOrReplaceTempView(\"DatasetA\")\r\n",
+							"\r\n",
+							"dfa.show()"
+						],
+						"outputs": [],
+						"execution_count": 25
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"dfb = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset B.csv', format='csv'\r\n",
+							"## If header exists uncomment line below\r\n",
+							", header=True\r\n",
+							")\r\n",
+							"\r\n",
+							"dfb.createOrReplaceTempView(\"Datasetb\")\r\n",
+							"dfb.show()"
+						],
+						"outputs": [],
+						"execution_count": 26
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"Select [patient id] from Dataseta \r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 31
+					}
+				]
 			},
 			"dependsOn": []
 		}

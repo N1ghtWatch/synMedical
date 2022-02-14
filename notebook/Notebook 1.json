@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dfffbc2d-eae8-43c7-8250-987884ef86d9"
+				"spark.autotune.trackingId": "2196da87-33ed-4b55-b844-7bd2d7aa84ba"
 			}
 		},
 		"metadata": {
@@ -66,9 +66,9 @@
 					"\r\n",
 					"dfb = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\")\r\n",
 					"\r\n",
-					"dfb.show()"
+					"##dfb.show()"
 				],
-				"execution_count": 10
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -97,9 +97,9 @@
 					"\r\n",
 					"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\")\r\n",
 					"\r\n",
-					"dfd.show()"
+					"##dfd.show()"
 				],
-				"execution_count": 6
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -120,35 +120,11 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"dfe = dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\")\r\n",
+					"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
 					"\r\n",
-					"dfe.show()"
+					""
 				],
-				"execution_count": 13
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"microsoft": {
-						"language": "python"
-					}
-				},
-				"source": [
-					"%%pyspark\r\n",
-					"\r\n",
-					"\r\n",
-					"dfe.write.parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")"
-				],
-				"execution_count": 15
+				"execution_count": 19
 			}
 		]
 	}

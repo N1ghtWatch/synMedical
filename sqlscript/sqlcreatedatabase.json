@@ -2,12 +2,12 @@
 	"name": "sqlcreatedatabase",
 	"properties": {
 		"content": {
-			"query": "DROP DATABASE IF EXISTS dbmedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')",
+			"query": "DROP DATABASE IF EXISTS dbmedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')\n\nCREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "dbmedical",
+				"databaseName": "dbMedical",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000

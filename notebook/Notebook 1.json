@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a8afccb9-bf8c-4f79-a0be-420eded95b9d"
+				"spark.autotune.trackingId": "62ebf3bb-ad14-40cb-a478-2199db92677f"
 			}
 		},
 		"metadata": {
@@ -28,7 +28,7 @@
 				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
-				"name": "sql"
+				"name": "python"
 			},
 			"a365ComputeOptions": {
 				"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
@@ -66,9 +66,9 @@
 					"\r\n",
 					"dfb = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\")\r\n",
 					"\r\n",
-					"##dfa.show()"
+					"dfb.show()"
 				],
-				"execution_count": 7
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -113,13 +113,42 @@
 							"deleting": false
 						}
 					},
+					"microsoft": {
+						"language": "python"
+					},
 					"collapsed": false
 				},
 				"source": [
-					"Select [patient id] from Dataseta \r\n",
-					""
+					"%%pyspark\r\n",
+					"dfe = dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\")\r\n",
+					"\r\n",
+					"dfe.show()"
 				],
-				"execution_count": 31
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"\r\n",
+					"\r\n",
+					"dfe.write.parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")"
+				],
+				"execution_count": 15
 			}
 		]
 	}

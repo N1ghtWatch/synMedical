@@ -25,6 +25,15 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('workspaceName'), '/spMedical')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/IngestData')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -766,7 +775,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "06ef3566-79f1-444e-b6a9-c173fc647cac"
+						"spark.autotune.trackingId": "89be1c2d-340f-4c16-9516-078a1af737a4"
 					}
 				},
 				"metadata": {
@@ -777,7 +786,7 @@
 						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
-						"name": "sql"
+						"name": "python"
 					},
 					"a365ComputeOptions": {
 						"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
@@ -791,7 +800,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -812,10 +822,12 @@
 							"\r\n",
 							"dfa.createOrReplaceTempView(\"DatasetA\")\r\n",
 							"\r\n",
-							"dfa.show()"
+							"dfb = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\")\r\n",
+							"\r\n",
+							"dfb.show()"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -835,16 +847,19 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
-							"dfb = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset B.csv', format='csv'\r\n",
+							"dfc = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset B.csv', format='csv'\r\n",
 							"## If header exists uncomment line below\r\n",
 							", header=True\r\n",
 							")\r\n",
 							"\r\n",
-							"dfb.createOrReplaceTempView(\"Datasetb\")\r\n",
-							"dfb.show()"
+							"dfc.createOrReplaceTempView(\"Datasetb\")\r\n",
+							"\r\n",
+							"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\")\r\n",
+							"\r\n",
+							"dfd.show()"
 						],
 						"outputs": [],
-						"execution_count": 26
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -858,14 +873,44 @@
 									"deleting": false
 								}
 							},
+							"microsoft": {
+								"language": "python"
+							},
 							"collapsed": false
 						},
 						"source": [
-							"Select [patient id] from Dataseta \r\n",
-							""
+							"%%pyspark\r\n",
+							"dfe = dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\")\r\n",
+							"\r\n",
+							"dfe.show()"
 						],
 						"outputs": [],
-						"execution_count": 31
+						"execution_count": 13
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"\r\n",
+							"\r\n",
+							"dfe.write.parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")"
+						],
+						"outputs": [],
+						"execution_count": 15
 					}
 				]
 			},

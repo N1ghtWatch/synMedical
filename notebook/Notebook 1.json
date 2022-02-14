@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "06ef3566-79f1-444e-b6a9-c173fc647cac"
+				"spark.autotune.trackingId": "a8afccb9-bf8c-4f79-a0be-420eded95b9d"
 			}
 		},
 		"metadata": {
@@ -64,9 +64,11 @@
 					"\r\n",
 					"dfa.createOrReplaceTempView(\"DatasetA\")\r\n",
 					"\r\n",
-					"dfa.show()"
+					"dfb = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\")\r\n",
+					"\r\n",
+					"##dfa.show()"
 				],
-				"execution_count": 25
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -86,15 +88,18 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"dfb = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset B.csv', format='csv'\r\n",
+					"dfc = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset B.csv', format='csv'\r\n",
 					"## If header exists uncomment line below\r\n",
 					", header=True\r\n",
 					")\r\n",
 					"\r\n",
-					"dfb.createOrReplaceTempView(\"Datasetb\")\r\n",
-					"dfb.show()"
+					"dfc.createOrReplaceTempView(\"Datasetb\")\r\n",
+					"\r\n",
+					"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\")\r\n",
+					"\r\n",
+					"dfd.show()"
 				],
-				"execution_count": 26
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",

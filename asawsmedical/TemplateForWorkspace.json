@@ -72,7 +72,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/ProcessData')]"
+				"[concat(variables('workspaceId'), '/dataflows/ProcessData')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -671,7 +672,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "DROP DATABASE IF EXISTS dbmedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')\n\nCREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
+					"query": "DROP DATABASE IF EXISTS dbmedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -766,7 +767,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2196da87-33ed-4b55-b844-7bd2d7aa84ba"
+						"spark.autotune.trackingId": "2fb6fff7-4a1b-464a-bae3-cc6f107d33b4"
 					}
 				},
 				"metadata": {
@@ -791,7 +792,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -902,7 +904,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f6047420-0bbf-408b-97f2-4f64b5f0d4d7"
+						"spark.autotune.trackingId": "d024492a-0b85-47f9-96fb-d1e4d2744f9b"
 					}
 				},
 				"metadata": {
@@ -927,7 +929,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -953,11 +956,51 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/spMedical')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/createviewmedical')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
 			},
 			"dependsOn": []
 		}

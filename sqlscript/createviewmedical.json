@@ -2,7 +2,7 @@
 	"name": "createviewmedical",
 	"properties": {
 		"content": {
-			"query": "Use dbMedical\nGO\n\nDROP VIEW IF EXISTS viewMedical\nGO\n\nCREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
+			"query": "Use dbMedical\nGO\n\nDROP VIEW IF EXISTS viewMedical\nGO\n\nCREATE VIEW viewMedical AS\nSELECT\n    top 300 *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
 			"metadata": {
 				"language": "sql"
 			},

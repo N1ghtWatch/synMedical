@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "69cc1554-c3d1-49e2-a80b-1b2182e526ff"
+				"spark.autotune.trackingId": "e77e0de7-a1c7-41e4-8113-3361b9798c87"
 			}
 		},
 		"metadata": {
@@ -68,7 +68,7 @@
 					"\r\n",
 					"##dfb.show()"
 				],
-				"execution_count": 13
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -99,7 +99,27 @@
 					"\r\n",
 					"##dfd.show()"
 				],
-				"execution_count": 14
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import when\r\n",
+					"\r\n",
+					"dfd.withColumn(\"In_Military\", when(dfd.military_service == \"yes\" , \"In Military\").otherwise(\"Non-Military\") ).show()"
+				],
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -120,11 +140,11 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
+					"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.mode('overwrite').parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 4
 			}
 		]
 	}

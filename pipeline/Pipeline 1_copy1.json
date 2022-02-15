@@ -1,0 +1,37 @@
+{
+	"name": "Pipeline 1_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "sp_executesql",
+					"storedProcedureParameters": {
+						"statement": {
+							"value": "\"Use dbMedical\nGO\n\nDROP VIEW IF EXISTS viewMedical\nGO\n\nCREATE VIEW viewMedical AS\nSELECT\n    top 300 *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\"\n",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "asawsmedical-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "dbmedical"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}

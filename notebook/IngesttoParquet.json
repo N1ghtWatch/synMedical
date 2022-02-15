@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3a93d120-79c1-48de-9d9c-d0a31f74b53f"
+				"spark.autotune.trackingId": "d1da9df1-d6bc-4816-ab37-7edaa2420336"
 			}
 		},
 		"metadata": {
@@ -69,7 +69,7 @@
 					"dfc = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\").withColumn(\"Age\",floor(datediff(current_date(),to_date(\"dob\",\"dd-MM-yyyy\"))/365.25 ))\r\n",
 					""
 				],
-				"execution_count": 47
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -100,10 +100,10 @@
 					"                                    otherwise( \"65 and Over\") ). \\\r\n",
 					"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) )\r\n",
 					"\r\n",
-					"dfb.show()\r\n",
+					"##dfb.show()\r\n",
 					""
 				],
-				"execution_count": 48
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"\r\n",
 					"##dfd.show()"
 				],
-				"execution_count": 49
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -157,11 +157,11 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").show() ##write.mode('overwrite').parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
+					"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.mode('overwrite').parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 50
+				"execution_count": 55
 			}
 		]
 	}

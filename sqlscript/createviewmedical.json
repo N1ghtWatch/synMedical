@@ -1,0 +1,17 @@
+{
+	"name": "createviewmedical",
+	"properties": {
+		"content": {
+			"query": "CREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "CreateObservationView",
+	"properties": {
+		"content": {
+			"query": "-- This is auto-generated code\nCreate View Observations as (\n    (SELECT\n        Observation1,Observation2,Observation3,Observation4,Observation5, '     ' [Blank] ,\n        (select Cast( count(1) as char)  from viewMedical) [Total Count]\n    FROM\n        OPENROWSET( BULK 'https://sac7a.dfs.core.windows.net/conc7a/Medical/Observations.csv',\n            FORMAT = 'CSV', HEADER_ROW =true, PARSER_VERSION = '2.0') a )\n)\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dbMedical",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

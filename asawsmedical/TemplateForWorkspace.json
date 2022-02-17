@@ -25,6 +25,15 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('workspaceName'), '/spMedical')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/IngestData')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -72,18 +81,17 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/ProcessData')]",
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/dataflows/ProcessData')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+			"name": "[concat(parameters('workspaceName'), '/MedicalData')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"activities": [
 					{
-						"name": "Copy data1",
+						"name": "ConvertDatasetBtoXLS",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -138,6 +146,33 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "CSVtoParquet",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "ConvertDatasetBtoXLS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "IngesttoParquet",
+								"type": "NotebookReference"
+							},
+							"snapshot": true
+						}
 					}
 				],
 				"policy": {
@@ -148,7 +183,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/dsxlxdatasetb')]",
-				"[concat(variables('workspaceId'), '/datasets/dscsvdestination')]"
+				"[concat(variables('workspaceId'), '/datasets/dscsvdestination')]",
+				"[concat(variables('workspaceId'), '/notebooks/IngesttoParquet')]"
 			]
 		},
 		{
@@ -667,12 +703,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlcreatedatabase')]",
+			"name": "[concat(parameters('workspaceName'), '/createviewmedical')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "DROP DATABASE IF EXISTS dbmedical\nGO\nCREATE DATABASE dbMedical\nGO\nUSE dbMedical\nGO\nCREATE EXTERNAL DATA SOURCE AzureOpenData\nWITH ( LOCATION = 'https://sac7a.dfs.core.windows.net')\n",
+					"query": "Use dbMedical\nGO\n\nDROP VIEW IF EXISTS viewMedical\nGO\n\nCREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -687,32 +723,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlcreateviewdataseta')]",
+			"name": "[concat(parameters('workspaceName'), '/sqlcreatedatabase')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-- This is auto-generated code\nCREATE VIEW DatasetA AS (\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/Medical/Dataset A.csv',\n        FORMAT = 'CSV',\n        HEADER_ROW=true,\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n)",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/sqlcreateviewdatasetb')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nCREATE VIEW DatasetA AS (\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/Medical/Dataset b.csv',\n        FORMAT = 'CSV',\n        HEADER_ROW=true,\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n)",
+					"query": "DROP DATABASE IF EXISTS dbmedical\nGO\nCREATE DATABASE dbMedical\nGO\n\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -732,7 +748,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "Use dbMedical\nGO\n\nDROP EXTERNAL DATA SOURCE AzureOpenData\nGO\n\nUse MASTER\nGO\n\nDROP DATABASE dbMedical\n\n",
+					"query": "Use dbMedical\nGO\n\nUse MASTER\nGO\n\nDROP DATABASE dbMedical\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -747,7 +763,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"name": "[concat(parameters('workspaceName'), '/IngesttoParquet')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -767,7 +783,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2fb6fff7-4a1b-464a-bae3-cc6f107d33b4"
+						"spark.autotune.trackingId": "a80524a6-2e66-4cbc-a75c-f1f6bbe49db3"
 					}
 				},
 				"metadata": {
@@ -792,8 +808,7 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -807,19 +822,19 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
+							"from pyspark.sql.functions import *\r\n",
+							"\r\n",
 							"dfa = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset A.csv', format='csv'\r\n",
-							"## If header exists uncomment line below\r\n",
 							", header=True\r\n",
 							")\r\n",
 							"\r\n",
 							"dfa.createOrReplaceTempView(\"DatasetA\")\r\n",
 							"\r\n",
-							"dfb = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\")\r\n",
-							"\r\n",
-							"##dfb.show()"
+							"dfc = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\").withColumn(\"Age\",floor(datediff(current_date(),to_date(\"dob\",\"dd-MM-yyyy\"))/365.25 ))\r\n",
+							""
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -839,19 +854,53 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
+							"\r\n",
+							"dfb = dfc.withColumn(\"Age_Bracket\" ,when( dfc.Age < 18 , \"17 and below\"). \\\r\n",
+							"                                    when( dfc.Age < 25 , \"18 - 24\"). \\\r\n",
+							"                                    when( dfc.Age < 35 , \"25 - 34\"). \\\r\n",
+							"                                    when( dfc.Age < 45 , \"35 - 44\"). \\\r\n",
+							"                                    when( dfc.Age < 55 , \"45 - 54\"). \\\r\n",
+							"                                    when( dfc.Age < 65 , \"55 - 64\"). \\\r\n",
+							"                                    otherwise( \"65 and Over\") ). \\\r\n",
+							"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) )\r\n",
+							"\r\n",
+							"##dfb.show()\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"\r\n",
 							"dfc = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/Medical/Dataset B.csv', format='csv'\r\n",
-							"## If header exists uncomment line below\r\n",
 							", header=True\r\n",
 							")\r\n",
 							"\r\n",
 							"dfc.createOrReplaceTempView(\"Datasetb\")\r\n",
 							"\r\n",
-							"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\")\r\n",
+							"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\").withColumn(\"In_Military\", when(dfc.military_service == \"yes\" , \"In Military\").otherwise(\"Non-Military\") )\r\n",
 							"\r\n",
 							"##dfd.show()"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -872,135 +921,13 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
-							"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
-							"\r\n",
+							"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.mode('overwrite').parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 9
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "spMedical",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d024492a-0b85-47f9-96fb-d1e4d2744f9b"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
-						"name": "spMedical",
-						"type": "Spark",
-						"endpoint": "https://asawsmedical.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spMedical",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.1",
-						"nodeCount": 10,
-						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {
-							"microsoft": {
-								"language": "sparksql"
-							},
-							"collapsed": false
-						},
-						"source": [
-							"%%sql\r\n",
-							"\r\n",
-							"Create DATABASE dbmedical"
-						],
-						"outputs": [],
-						"execution_count": 1
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/spMedical')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/createviewmedical')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "CREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/part-00000-593b9fae-0bcb-482f-a82c-89f01839729b-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
 			},
 			"dependsOn": []
 		}

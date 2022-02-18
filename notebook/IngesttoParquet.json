@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a80524a6-2e66-4cbc-a75c-f1f6bbe49db3"
+				"spark.autotune.trackingId": "ddf56d92-1a2f-4ec6-89b8-a7703061c33b"
 			}
 		},
 		"metadata": {
@@ -68,7 +68,7 @@
 					"dfc = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\").withColumn(\"Age\",floor(datediff(current_date(),to_date(\"dob\",\"dd-MM-yyyy\"))/365.25 ))\r\n",
 					""
 				],
-				"execution_count": 6
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -96,12 +96,13 @@
 					"                                    when( dfc.Age < 55 , \"45 - 54\"). \\\r\n",
 					"                                    when( dfc.Age < 65 , \"55 - 64\"). \\\r\n",
 					"                                    otherwise( \"65 and Over\") ). \\\r\n",
-					"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) )\r\n",
+					"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) ). \\\r\n",
+					"         withColumn(\"education\",regexp_replace(\"education\",\"highscool\" , \"highschool\"))\r\n",
 					"\r\n",
 					"##dfb.show()\r\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -132,7 +133,7 @@
 					"\r\n",
 					"##dfd.show()"
 				],
-				"execution_count": 8
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -156,7 +157,7 @@
 					"dfb.join( dfd , dfb.Patient_ID == dfd.P_ID,\"inner\").write.mode('overwrite').parquet(\"abfss://conc7a@sac7a.dfs.core.windows.net/medicaldata\")\r\n",
 					""
 				],
-				"execution_count": 9
+				"execution_count": 4
 			}
 		]
 	}

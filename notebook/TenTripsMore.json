@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 1",
+	"name": "TenTripsMore",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "30f7cf46-03d5-43ca-a0b5-b01f3707ad31"
+				"spark.autotune.trackingId": "e9b29e16-2ede-4838-87df-9161a3e6c410"
 			}
 		},
 		"metadata": {
@@ -51,14 +51,17 @@
 			{
 				"cell_type": "code",
 				"metadata": {
+					"microsoft": {
+						"language": "python"
+					},
 					"collapsed": false
 				},
 				"source": [
 					"%%pyspark\r\n",
 					"df = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/synapse/TrainingFiles/NYCTripSmall.parquet', format='parquet')\r\n",
-					"display(df.limit(10))"
+					"##display(df.limit(10))"
 				],
-				"execution_count": 64
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -76,7 +79,7 @@
 				"source": [
 					"df.write.mode(\"overwrite\").saveAsTable(\"nycsmalldata\")"
 				],
-				"execution_count": 65
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -98,9 +101,10 @@
 				"source": [
 					"%%pyspark\r\n",
 					"df = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/synapse/workspaces/asawsmedical/warehouse/nycsmalldata', format='parquet')\r\n",
-					"display(df.limit(10))"
+					"\r\n",
+					"##display(df.limit(10))"
 				],
-				"execution_count": 75
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -121,7 +125,7 @@
 					"\r\n",
 					"dfagg = df.groupby( \"MedallionID\", \"HackneyLicenseID\").agg( f.sum(\"FareAmount\").alias( \"FareAmount\"),f.sum(\"TripDistanceMiles\").alias( \"TripDistanceMiles\"),  f.count(f.lit(1)).alias(\"Trips\") )"
 				],
-				"execution_count": 81
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -139,7 +143,7 @@
 				"source": [
 					"dfagg.sort( f.col(\"TripDistanceMiles\").desc()).show()"
 				],
-				"execution_count": 86
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -156,9 +160,9 @@
 				},
 				"source": [
 					"\r\n",
-					"dfagg.filter( f.col(\"trips\") > 15 ).show()"
+					"dfagg.filter( f.col(\"trips\") > 9 ).write.mode(\"overwrite\").saveAsTable(\"tentripsmore\")"
 				],
-				"execution_count": 88
+				"execution_count": 13
 			}
 		]
 	}

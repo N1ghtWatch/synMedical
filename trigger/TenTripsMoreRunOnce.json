@@ -1,0 +1,33 @@
+{
+	"name": "TenTripsMoreRunOnce",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "TenTripsMore",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-02-24T06:39:00",
+				"endTime": "2022-02-25T10:39:00",
+				"timeZone": "Pacific Standard Time",
+				"schedule": {
+					"minutes": [
+						30
+					],
+					"hours": [
+						9
+					]
+				}
+			}
+		}
+	}
+}

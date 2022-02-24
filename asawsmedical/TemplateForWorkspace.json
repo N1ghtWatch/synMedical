@@ -188,6 +188,51 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/TenTripsMore')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "TenTripsMore",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "TenTripsMore",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "spMedical",
+								"type": "BigDataPoolReference"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "SynapseExercise"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/TenTripsMore')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/spMedical')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/AzureSqlDestination')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -703,12 +748,32 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/CreateObservationView')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nCreate View Observations as (\n    (SELECT\n        Observation1,Observation2,Observation3,Observation4,Observation5, '     ' [Blank] ,\n        (select Cast( count(1) as char)  from viewMedical) [Total Count]\n    FROM\n        OPENROWSET( BULK 'https://sac7a.dfs.core.windows.net/conc7a/Medical/Observations.csv',\n            FORMAT = 'CSV', HEADER_ROW =true, PARSER_VERSION = '2.0') a )\n)\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dbMedical",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/createviewmedical')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "Use dbMedical\nGO\n\nDROP VIEW IF EXISTS viewMedical\nGO\n\nCREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n",
+					"query": "Use dbMedical\nGO\n\nDROP VIEW IF EXISTS viewMedical\nGO\n\nCREATE VIEW viewMedical AS\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/medicaldata/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\nGO\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -783,7 +848,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a80524a6-2e66-4cbc-a75c-f1f6bbe49db3"
+						"spark.autotune.trackingId": "ddf56d92-1a2f-4ec6-89b8-a7703061c33b"
 					}
 				},
 				"metadata": {
@@ -834,7 +899,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -862,13 +927,14 @@
 							"                                    when( dfc.Age < 55 , \"45 - 54\"). \\\r\n",
 							"                                    when( dfc.Age < 65 , \"55 - 64\"). \\\r\n",
 							"                                    otherwise( \"65 and Over\") ). \\\r\n",
-							"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) )\r\n",
+							"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) ). \\\r\n",
+							"         withColumn(\"education\",regexp_replace(\"education\",\"highscool\" , \"highschool\"))\r\n",
 							"\r\n",
 							"##dfb.show()\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -900,7 +966,7 @@
 							"##dfd.show()"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -925,7 +991,184 @@
 							""
 						],
 						"outputs": [],
+						"execution_count": 4
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TenTripsMore')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "spMedical",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "e9b29e16-2ede-4838-87df-9161a3e6c410"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
+						"name": "spMedical",
+						"type": "Spark",
+						"endpoint": "https://asawsmedical.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spMedical",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/synapse/TrainingFiles/NYCTripSmall.parquet', format='parquet')\r\n",
+							"##display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df.write.mode(\"overwrite\").saveAsTable(\"nycsmalldata\")"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/synapse/workspaces/asawsmedical/warehouse/nycsmalldata', format='parquet')\r\n",
+							"\r\n",
+							"##display(df.limit(10))"
+						],
+						"outputs": [],
 						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"import pyspark.sql.functions as f\r\n",
+							"\r\n",
+							"dfagg = df.groupby( \"MedallionID\", \"HackneyLicenseID\").agg( f.sum(\"FareAmount\").alias( \"FareAmount\"),f.sum(\"TripDistanceMiles\").alias( \"TripDistanceMiles\"),  f.count(f.lit(1)).alias(\"Trips\") )"
+						],
+						"outputs": [],
+						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"dfagg.sort( f.col(\"TripDistanceMiles\").desc()).show()"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"\r\n",
+							"dfagg.filter( f.col(\"trips\") > 9 ).write.mode(\"overwrite\").saveAsTable(\"tentripsmore\")"
+						],
+						"outputs": [],
+						"execution_count": 13
 					}
 				]
 			},

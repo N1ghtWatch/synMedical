@@ -25,15 +25,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/spMedical')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/IngestData')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -210,11 +201,7 @@
 								"referenceName": "TenTripsMore",
 								"type": "NotebookReference"
 							},
-							"snapshot": true,
-							"sparkPool": {
-								"referenceName": "spMedical",
-								"type": "BigDataPoolReference"
-							}
+							"snapshot": true
 						}
 					}
 				],
@@ -228,8 +215,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/TenTripsMore')]",
-				"[concat(variables('workspaceId'), '/bigDataPools/spMedical')]"
+				"[concat(variables('workspaceId'), '/notebooks/TenTripsMore')]"
 			]
 		},
 		{
@@ -666,7 +652,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -887,7 +873,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ddf56d92-1a2f-4ec6-89b8-a7703061c33b"
+						"spark.autotune.trackingId": "3e949723-f069-4748-8d68-00a7a2f8d0a7"
 					}
 				},
 				"metadata": {
@@ -912,7 +898,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -934,11 +921,15 @@
 							"\r\n",
 							"dfa.createOrReplaceTempView(\"DatasetA\")\r\n",
 							"\r\n",
-							"dfc = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ).withColumnRenamed(\"Employee Name\",\"Employee_Name\").withColumn(\"Age\",floor(datediff(current_date(),to_date(\"dob\",\"dd-MM-yyyy\"))/365.25 ))\r\n",
+							"dfc = dfa.withColumnRenamed( \"Patient id\" , \"Patient_ID\" ). \\\r\n",
+							"          withColumnRenamed(\"Employee Name\",\"Employee_Name\"). \\\r\n",
+							"          withColumn(\"Age\",floor(datediff(current_date(),to_date(\"dob\",\"dd-MM-yyyy\"))/365.25 )). \\\r\n",
+							"          withColumn(\"gender\", initcap(col(\"gender\"))). \\\r\n",
+							"          withColumn(\"employment_status\",initcap(col(\"employment_status\")))\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 23
 					},
 					{
 						"cell_type": "code",
@@ -967,13 +958,14 @@
 							"                                    when( dfc.Age < 65 , \"55 - 64\"). \\\r\n",
 							"                                    otherwise( \"65 and Over\") ). \\\r\n",
 							"         withColumn(\"Birth_Month\" , month( to_date(\"dob\",\"dd-MM-yyyy\")  ) ). \\\r\n",
-							"         withColumn(\"education\",regexp_replace(\"education\",\"highscool\" , \"highschool\"))\r\n",
+							"         withColumn(\"education\",regexp_replace(\"education\",\"highscool\" , \"highschool\")). \\\r\n",
+							"         withColumn(\"education\" , when( upper(\"education\") == \"PHD/MD\",\"PhD/MD\").otherwise(initcap( col(\"education\"))))\r\n",
 							"\r\n",
 							"##dfb.show()\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 24
 					},
 					{
 						"cell_type": "code",
@@ -1000,12 +992,15 @@
 							"\r\n",
 							"dfc.createOrReplaceTempView(\"Datasetb\")\r\n",
 							"\r\n",
-							"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\").withColumn(\"In_Military\", when(dfc.military_service == \"yes\" , \"In Military\").otherwise(\"Non-Military\") )\r\n",
+							"dfd = dfc.withColumnRenamed( \"P. id\" , \"P_ID\"). \\\r\n",
+							"          withColumn(\"In_Military\", when(dfc.military_service == \"yes\" , \"In Military\").otherwise(\"Non-Military\") ). \\\r\n",
+							"          withColumn(\"disease\" , when( upper(\"disease\") == \"HIV/AIDS\",\"HIV/AIDS\").otherwise(initcap( col(\"disease\")))). \\\r\n",
+							"          withColumn(\"marital_status\", initcap(\"marital_status\"))\r\n",
 							"\r\n",
 							"##dfd.show()"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 26
 					},
 					{
 						"cell_type": "code",
@@ -1030,7 +1025,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": 27
 					}
 				]
 			},
@@ -1210,6 +1205,15 @@
 						"execution_count": 13
 					}
 				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/spMedical')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
 			},
 			"dependsOn": []
 		}

@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP (100) [Employee_Name]\n,[gender]\n,[dob]\n,[zipcode]\n,[employment_status]\n,[education]\n,[P_ID]\n,[In_Military]\n,[ancestry]\n,[avg_commute]\n,[daily_internet_use]\n,[available_vehicles]\n,[military_service]\n,[disease]\n,[Patient_ID]\n,[Age]\n,[Age_Bracket]\n,[Birth_Month]\n,[marital_status]\n,[children]\n FROM [dbo].[viewMedical]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dbMedical",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

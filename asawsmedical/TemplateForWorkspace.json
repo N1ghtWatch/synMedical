@@ -1036,7 +1036,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/MergeAndAggregate')]",
+			"name": "[concat(parameters('workspaceName'), '/IrisWithoutHeader')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1059,7 +1059,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f164ff8f-c753-4643-bfe1-16d75dfd60d3"
+						"spark.autotune.trackingId": "dda5ba15-d26a-44df-b7ec-cc16418a8051"
 					}
 				},
 				"metadata": {
@@ -1086,6 +1086,127 @@
 						"cores": 4,
 						"memory": 28,
 						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_withoutHeader.csv', format='csv'\r\n",
+							"## If header exists uncomment line below\r\n",
+							"##, header=True\r\n",
+							")\r\n",
+							"\r\n",
+							"display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 132
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"df = df.toDF(  \"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\",\"Species\" )\r\n",
+							"\r\n",
+							"display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 133
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from pyspark.sql.functions import *\r\n",
+							"\r\n",
+							"df.groupBy(\"Species\").agg( countDistinct(\"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\").alias('DistinctCount') ).orderBy(\"Species\").show()"
+						],
+						"outputs": [],
+						"execution_count": 140
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MergeAndAggregate')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "IrisDatasets"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "spMedical",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "bd46d112-797d-489d-a8ea-3ef72821c627"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
+						"name": "spMedical",
+						"type": "Spark",
+						"endpoint": "https://asawsmedical.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spMedical",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1388,107 +1509,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/IrisWithoutHeader')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "IrisDatasets"
-				},
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "spMedical",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "6488f6a3-e4f7-41a8-a6be-be5c2b545821"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
-						"name": "spMedical",
-						"type": "Spark",
-						"endpoint": "https://asawsmedical.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spMedical",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.1",
-						"nodeCount": 10,
-						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {
-							"microsoft": {
-								"language": "python"
-							},
-							"collapsed": false
-						},
-						"source": [
-							"%%pyspark\r\n",
-							"df = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_withoutHeader.csv', format='csv'\r\n",
-							"## If header exists uncomment line below\r\n",
-							"##, header=True\r\n",
-							")\r\n",
-							"\r\n",
-							"display(df.limit(10))"
-						],
-						"outputs": [],
-						"execution_count": 132
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							},
-							"collapsed": false
-						},
-						"source": [
-							"df = df.toDF(  \"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\",\"Species\" )\r\n",
-							"\r\n",
-							"display(df.limit(10))"
-						],
-						"outputs": [],
-						"execution_count": 133
-					}
-				]
-			},
-			"dependsOn": []
 		}
 	]
 }

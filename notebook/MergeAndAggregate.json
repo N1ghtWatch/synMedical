@@ -1,6 +1,9 @@
 {
-	"name": "Notebook 1",
+	"name": "MergeAndAggregate",
 	"properties": {
+		"folder": {
+			"name": "IrisDatasets"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "44b5ba6d-8268-427f-be16-bba7aeaef357"
+				"spark.autotune.trackingId": "bd46d112-797d-489d-a8ea-3ef72821c627"
 			}
 		},
 		"metadata": {
@@ -51,19 +54,16 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"microsoft": {
-						"language": "python"
-					},
 					"collapsed": false
 				},
 				"source": [
-					"%%pyspark\r\n",
-					"df1 = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_merge1.csv', format='csv'\r\n",
-					"## If header exists uncomment line below\r\n",
-					", header=True\r\n",
-					")\r\n",
+					"## Load iris_merge1.csv to a dataflow\r\n",
 					"\r\n",
-					"display(df1.limit(10))"
+					"%%pyspark\r\n",
+					"\r\n",
+					"dfMerge1 = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_merge1.csv', format='csv'\r\n",
+					", header=True\r\n",
+					")"
 				],
 				"execution_count": 2
 			},
@@ -86,12 +86,11 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"df2 = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_merge2.csv', format='csv'\r\n",
-					"## If header exists uncomment line below\r\n",
-					", header=True\r\n",
-					")\r\n",
 					"\r\n",
-					"display(df2.limit(10))"
+					"dfMerge2 = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_merge2.csv', format='csv'\r\n",
+					"\r\n",
+					", header=True\r\n",
+					")"
 				],
 				"execution_count": 3
 			},
@@ -110,9 +109,10 @@
 					"collapsed": false
 				},
 				"source": [
-					"df3 = df1.join( df2, df1.ID == df2.ID , \"inner\")\r\n",
+					"## Join the two datasets\r\n",
+					"dfMerged = dfMerge1.join( dfMerge2, dfMerge1.ID == dfMerge2.ID , \"inner\")\r\n",
 					"\r\n",
-					"display( df3.limit(20))"
+					"display( dfMerged.limit(20))"
 				],
 				"execution_count": 7
 			},
@@ -131,11 +131,12 @@
 					"collapsed": false
 				},
 				"source": [
+					"## Perform aggregation\r\n",
 					"from pyspark.sql.functions import *\r\n",
 					"\r\n",
-					"df4 = df3.groupby(\"Species\").agg( avg(\"Sepal_Length\").alias( \"AVG_Sepal_Length\"))\r\n",
+					"dfAgg = dfMerged.groupby(\"Species\").agg( avg(\"Sepal_Length\").alias( \"AVG_Sepal_Length\"))\r\n",
 					"\r\n",
-					"display(df4)"
+					"display(dfAgg)"
 				],
 				"execution_count": 16
 			}

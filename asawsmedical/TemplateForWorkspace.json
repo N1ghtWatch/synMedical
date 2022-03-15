@@ -1059,7 +1059,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ea0392b0-47fd-418d-9123-72e8fbeca234"
+						"spark.autotune.trackingId": "9b48a928-2cb0-40d2-bcb1-04ddf568676d"
 					}
 				},
 				"metadata": {
@@ -1103,12 +1103,34 @@
 							"df = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_withoutHeader.csv', format='csv'\r\n",
 							"## If header exists uncomment line below\r\n",
 							"##, header=True\r\n",
+							", schema=(\"Sepal_Length float, Sepal_Width float, Petal_Length float , Petal_Width float , Species string\")\r\n",
 							")\r\n",
 							"\r\n",
-							"##display(df.limit(10))"
+							"display(df.limit(10))\r\n",
+							"df.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 56
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display( df.summary(\"count\",\"mean\" , \"stddev\" , \"min\" , \"max\") )"
+						],
+						"outputs": [],
+						"execution_count": 66
 					},
 					{
 						"cell_type": "code",
@@ -1130,7 +1152,7 @@
 							"##display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 57
 					},
 					{
 						"cell_type": "code",
@@ -1153,7 +1175,7 @@
 							"df.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 24
+						"execution_count": 58
 					},
 					{
 						"cell_type": "code",
@@ -1174,7 +1196,7 @@
 							"df.groupBy(\"Species\").agg( countDistinct(\"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\").alias('DistinctCount') ).orderBy(\"Species\").show()"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 59
 					},
 					{
 						"cell_type": "code",
@@ -1231,7 +1253,7 @@
 							"display( df2.limit(20))"
 						],
 						"outputs": [],
-						"execution_count": 26
+						"execution_count": 60
 					},
 					{
 						"cell_type": "code",
@@ -1289,7 +1311,7 @@
 							"display( df2 )"
 						],
 						"outputs": [],
-						"execution_count": 41
+						"execution_count": 61
 					},
 					{
 						"cell_type": "code",
@@ -1314,7 +1336,7 @@
 							"display( df2 )                                     "
 						],
 						"outputs": [],
-						"execution_count": 45
+						"execution_count": 62
 					}
 				]
 			},

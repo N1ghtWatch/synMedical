@@ -1059,7 +1059,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "04af6505-23a6-43e7-bc6f-b67a88d12710"
+						"spark.autotune.trackingId": "ea0392b0-47fd-418d-9123-72e8fbeca234"
 					}
 				},
 				"metadata": {
@@ -1108,7 +1108,7 @@
 							"##display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": 22
 					},
 					{
 						"cell_type": "code",
@@ -1130,7 +1130,7 @@
 							"##display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 9
+						"execution_count": 23
 					},
 					{
 						"cell_type": "code",
@@ -1153,7 +1153,7 @@
 							"df.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 10
+						"execution_count": 24
 					},
 					{
 						"cell_type": "code",
@@ -1174,7 +1174,7 @@
 							"df.groupBy(\"Species\").agg( countDistinct(\"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\").alias('DistinctCount') ).orderBy(\"Species\").show()"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 25
 					},
 					{
 						"cell_type": "code",
@@ -1191,6 +1191,8 @@
 							"collapsed": false
 						},
 						"source": [
+							"##Sql Option\r\n",
+							"\r\n",
 							"df.createOrReplaceTempView( \"tempTableView\")\r\n",
 							"\r\n",
 							"df2 = spark.sql( \"Select Max( 'Count' ) Summary, Count( Sepal_Length ) Sepal_Length , \\\r\n",
@@ -1229,7 +1231,90 @@
 							"display( df2.limit(20))"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 26
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"## Spark aggregate and union all\r\n",
+							"\r\n",
+							"df2 = df.agg( max(lit(\"Count\")).alias(\"Summary\") , count( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
+							"                                                   count( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
+							"                                                   count( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
+							"                                                   count( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
+							"                                                   count( df.Species).alias(\"Species\")  \\\r\n",
+							"                                                    )\r\n",
+							"\r\n",
+							"df2 = df2.unionAll( df.agg( max(lit(\"Mean\")).alias(\"Summary\") , mean(df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
+							"                                                   mean( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
+							"                                                   mean( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
+							"                                                   mean( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
+							"                                                   mean( lit(0)).alias(\"Species\")  \\\r\n",
+							"                                                    ))\r\n",
+							"\r\n",
+							"df2 = df2.unionAll( df.agg( max(lit(\"StdDev\")).alias(\"Summary\") , stddev( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
+							"                                                   stddev( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
+							"                                                   stddev( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
+							"                                                   stddev( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
+							"                                                   stddev(lit(0)).alias(\"Species\")  \\\r\n",
+							"                                                    ))\r\n",
+							"\r\n",
+							"df2 = df2.unionAll( df.agg( max(lit(\"Min\")).alias(\"Summary\") , min( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
+							"                                                   min( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
+							"                                                   min( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
+							"                                                   min( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
+							"                                                   min( df.Species).alias(\"Species\")  \\\r\n",
+							"                                                    ))\r\n",
+							"\r\n",
+							"df2 = df2.unionAll( df.agg( max(lit(\"Max\")).alias(\"Summary\") , max( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
+							"                                                   max( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
+							"                                                   max( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
+							"                                                   max( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
+							"                                                   max( df.Species).alias(\"Species\")  \\\r\n",
+							"                                                    ))\r\n",
+							"\r\n",
+							"\r\n",
+							"display( df2 )"
+						],
+						"outputs": [],
+						"execution_count": 41
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"df2 = df.groupBy( \"Species\").agg( sum( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
+							"                                  sum( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
+							"                                  sum( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
+							"                                  sum( df.Petal_Width).alias(\"Petal_Width\")  )\r\n",
+							"\r\n",
+							"display( df2 )                                     "
+						],
+						"outputs": [],
+						"execution_count": 45
 					}
 				]
 			},

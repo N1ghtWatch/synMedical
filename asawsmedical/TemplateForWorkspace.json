@@ -1059,7 +1059,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9336ca87-d8e2-4c3b-ac57-d31bd84cd203"
+						"spark.autotune.trackingId": "04af6505-23a6-43e7-bc6f-b67a88d12710"
 					}
 				},
 				"metadata": {
@@ -1105,10 +1105,10 @@
 							"##, header=True\r\n",
 							")\r\n",
 							"\r\n",
-							"display(df.limit(10))"
+							"##display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 132
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -1127,10 +1127,33 @@
 						"source": [
 							"df = df.toDF(  \"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\",\"Species\" )\r\n",
 							"\r\n",
-							"display(df.limit(10))"
+							"##display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 133
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df.createOrReplaceTempView( \"tempTableView\")\r\n",
+							"\r\n",
+							"df = spark.sql( \"Select float(Sepal_Length),float(Sepal_Width),float(Petal_Length),float(Petal_Width),string(Species) from tempTableView\")\r\n",
+							"\r\n",
+							"df.printSchema()"
+						],
+						"outputs": [],
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -1151,7 +1174,62 @@
 							"df.groupBy(\"Species\").agg( countDistinct(\"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\").alias('DistinctCount') ).orderBy(\"Species\").show()"
 						],
 						"outputs": [],
-						"execution_count": 140
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"df.createOrReplaceTempView( \"tempTableView\")\r\n",
+							"\r\n",
+							"df2 = spark.sql( \"Select Max( 'Count' ) Summary, Count( Sepal_Length ) Sepal_Length , \\\r\n",
+							"                                                 Count( Sepal_Width ) Sepal_Width, \\\r\n",
+							"                                                 Count( Petal_Length ) Petal_Length, \\\r\n",
+							"                                                 Count( Petal_Width ) Petal_Width, \\\r\n",
+							"                                                 Count( Species ) Species from tempTableView \\\r\n",
+							"                  Union \\\r\n",
+							"                  Select Max( 'Mean' ) , Mean( Sepal_Length )  , \\\r\n",
+							"\t\t\t\t\t\t\t\t\t\t\t\t mean( Sepal_Width ) , \\\r\n",
+							"                                                 mean( Petal_Length ) , \\\r\n",
+							"                                                 mean( Petal_Width ) , \\\r\n",
+							"                                                 0  from tempTableView \\\r\n",
+							"                  Union \\\r\n",
+							"                  Select Max( 'StdDev' ) , StdDev( Sepal_Length )  , \\\r\n",
+							"\t\t\t\t\t\t\t\t\t\t\t\t StdDev( Sepal_Width ) , \\\r\n",
+							"                                                 StdDev( Petal_Length ) , \\\r\n",
+							"                                                 StdDev( Petal_Width ) , \\\r\n",
+							"                                                 0  from tempTableView \\\r\n",
+							"                  Union \\\r\n",
+							"                  Select Max( 'Min' ) , Min( Sepal_Length )  , \\\r\n",
+							"\t\t\t\t\t\t\t\t\t\t\t\t Min( Sepal_Width ) , \\\r\n",
+							"                                                 Min( Petal_Length ) , \\\r\n",
+							"                                                 Min( Petal_Width ) , \\\r\n",
+							"                                                 Min( Species )  from tempTableView \\\r\n",
+							"                  Union \\\r\n",
+							"                  Select Max( 'Max' ) , Max( Sepal_Length )  , \\\r\n",
+							"\t\t\t\t\t\t\t\t\t\t\t\t Max( Sepal_Width ) , \\\r\n",
+							"                                                 Max( Petal_Length ) , \\\r\n",
+							"                                                 Max( Petal_Width ) , \\\r\n",
+							"                                                 Max( Species )  from tempTableView \\\r\n",
+							"                  \")\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"display( df2.limit(20))"
+						],
+						"outputs": [],
+						"execution_count": 17
 					}
 				]
 			},

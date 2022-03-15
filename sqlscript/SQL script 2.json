@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "\nCREATE VIEW IrisData As (\nSELECT [Sepal_Length] [Sepal Length],\n[Sepal_Width] [Sepal Width],\n[Petal_Length] [Petal Length],\n[Petal_Width] [Petal Width],\n[Species]\n FROM [default].[dbo].[irisdata]\n\n)\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dbIris",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

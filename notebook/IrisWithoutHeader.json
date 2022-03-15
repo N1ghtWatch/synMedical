@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b5b88381-2d99-4537-b99d-847e78c61a33"
+				"spark.autotune.trackingId": "ef460318-ec13-4028-826b-f7fcd6117326"
 			}
 		},
 		"metadata": {
@@ -61,16 +61,20 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
+					"\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
 					"df = spark.read.load('abfss://irisdata@sac7a.dfs.core.windows.net/iris_withoutHeader.csv', format='csv'\r\n",
-					"## If header exists uncomment line below\r\n",
-					"##, header=True\r\n",
-					", schema=(\"Sepal_Length float, Sepal_Width float, Petal_Length float , Petal_Width float , Species string\")\r\n",
+					"    , schema=(\"Sepal_Length float, Sepal_Width float, Petal_Length float , Petal_Width float , Species string\")\r\n",
 					")\r\n",
 					"\r\n",
-					"display(df.limit(10))\r\n",
-					"df.printSchema()"
+					"##display(df.limit(10))\r\n",
+					"##df.printSchema()\r\n",
+					"\r\n",
+					"df.write.mode(\"overwrite\").saveAsTable(\"IrisData\")\r\n",
+					""
 				],
-				"execution_count": 56
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -102,57 +106,12 @@
 						"transient": {
 							"deleting": false
 						}
-					},
-					"collapsed": false
-				},
-				"source": [
-					"df = df.toDF(  \"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\",\"Species\" )\r\n",
-					"\r\n",
-					"##display(df.limit(10))"
-				],
-				"execution_count": 57
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
 					}
 				},
 				"source": [
-					"df.createOrReplaceTempView( \"tempTableView\")\r\n",
-					"\r\n",
-					"df = spark.sql( \"Select float(Sepal_Length),float(Sepal_Width),float(Petal_Length),float(Petal_Width),string(Species) from tempTableView\")\r\n",
-					"\r\n",
-					"df.printSchema()"
+					"df.groupBy(\"Species\").agg( countDistinct(\"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\").alias(\"DistinctCount\") ).orderBy(\"Species\").show()"
 				],
-				"execution_count": 58
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"from pyspark.sql.functions import *\r\n",
-					"\r\n",
-					"df.groupBy(\"Species\").agg( countDistinct(\"Sepal_Length\",\"Sepal_Width\",\"Petal_Length\",\"Petal_Width\").alias('DistinctCount') ).orderBy(\"Species\").show()"
-				],
-				"execution_count": 59
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -169,127 +128,31 @@
 					"collapsed": false
 				},
 				"source": [
-					"##Sql Option\r\n",
+					"df2 = df.groupBy( \"Species\").agg( *[sum( col(column)) for column in df.columns] )\r\n",
 					"\r\n",
-					"df.createOrReplaceTempView( \"tempTableView\")\r\n",
-					"\r\n",
-					"df2 = spark.sql( \"Select Max( 'Count' ) Summary, Count( Sepal_Length ) Sepal_Length , \\\r\n",
-					"                                                 Count( Sepal_Width ) Sepal_Width, \\\r\n",
-					"                                                 Count( Petal_Length ) Petal_Length, \\\r\n",
-					"                                                 Count( Petal_Width ) Petal_Width, \\\r\n",
-					"                                                 Count( Species ) Species from tempTableView \\\r\n",
-					"                  Union \\\r\n",
-					"                  Select Max( 'Mean' ) , Mean( Sepal_Length )  , \\\r\n",
-					"\t\t\t\t\t\t\t\t\t\t\t\t mean( Sepal_Width ) , \\\r\n",
-					"                                                 mean( Petal_Length ) , \\\r\n",
-					"                                                 mean( Petal_Width ) , \\\r\n",
-					"                                                 0  from tempTableView \\\r\n",
-					"                  Union \\\r\n",
-					"                  Select Max( 'StdDev' ) , StdDev( Sepal_Length )  , \\\r\n",
-					"\t\t\t\t\t\t\t\t\t\t\t\t StdDev( Sepal_Width ) , \\\r\n",
-					"                                                 StdDev( Petal_Length ) , \\\r\n",
-					"                                                 StdDev( Petal_Width ) , \\\r\n",
-					"                                                 0  from tempTableView \\\r\n",
-					"                  Union \\\r\n",
-					"                  Select Max( 'Min' ) , Min( Sepal_Length )  , \\\r\n",
-					"\t\t\t\t\t\t\t\t\t\t\t\t Min( Sepal_Width ) , \\\r\n",
-					"                                                 Min( Petal_Length ) , \\\r\n",
-					"                                                 Min( Petal_Width ) , \\\r\n",
-					"                                                 Min( Species )  from tempTableView \\\r\n",
-					"                  Union \\\r\n",
-					"                  Select Max( 'Max' ) , Max( Sepal_Length )  , \\\r\n",
-					"\t\t\t\t\t\t\t\t\t\t\t\t Max( Sepal_Width ) , \\\r\n",
-					"                                                 Max( Petal_Length ) , \\\r\n",
-					"                                                 Max( Petal_Width ) , \\\r\n",
-					"                                                 Max( Species )  from tempTableView \\\r\n",
-					"                  \")\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"display( df2.limit(20))"
-				],
-				"execution_count": 60
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"collapsed": false
-				},
-				"source": [
-					"## Spark aggregate and union all\r\n",
-					"\r\n",
-					"df2 = df.agg( max(lit(\"Count\")).alias(\"Summary\") , count( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
-					"                                                   count( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
-					"                                                   count( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
-					"                                                   count( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
-					"                                                   count( df.Species).alias(\"Species\")  \\\r\n",
-					"                                                    )\r\n",
-					"\r\n",
-					"df2 = df2.unionAll( df.agg( max(lit(\"Mean\")).alias(\"Summary\") , mean(df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
-					"                                                   mean( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
-					"                                                   mean( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
-					"                                                   mean( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
-					"                                                   mean( lit(0)).alias(\"Species\")  \\\r\n",
-					"                                                    ))\r\n",
-					"\r\n",
-					"df2 = df2.unionAll( df.agg( max(lit(\"StdDev\")).alias(\"Summary\") , stddev( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
-					"                                                   stddev( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
-					"                                                   stddev( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
-					"                                                   stddev( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
-					"                                                   stddev(lit(0)).alias(\"Species\")  \\\r\n",
-					"                                                    ))\r\n",
-					"\r\n",
-					"df2 = df2.unionAll( df.agg( max(lit(\"Min\")).alias(\"Summary\") , min( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
-					"                                                   min( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
-					"                                                   min( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
-					"                                                   min( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
-					"                                                   min( df.Species).alias(\"Species\")  \\\r\n",
-					"                                                    ))\r\n",
-					"\r\n",
-					"df2 = df2.unionAll( df.agg( max(lit(\"Max\")).alias(\"Summary\") , max( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
-					"                                                   max( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
-					"                                                   max( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
-					"                                                   max( df.Petal_Width).alias(\"Petal_Width\") , \\\r\n",
-					"                                                   max( df.Species).alias(\"Species\")  \\\r\n",
-					"                                                    ))\r\n",
-					"\r\n",
-					"\r\n",
-					"display( df2 )"
-				],
-				"execution_count": 61
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"collapsed": false
-				},
-				"source": [
-					"df2 = df.groupBy( \"Species\").agg( sum( df.Sepal_Length).alias(\"Sepal_Length\") , \\\r\n",
-					"                                  sum( df.Sepal_Width).alias(\"Sepal_Width\") , \\\r\n",
-					"                                  sum( df.Petal_Length).alias(\"Petal_Length\") , \\\r\n",
-					"                                  sum( df.Petal_Width).alias(\"Petal_Width\")  )\r\n",
+					"df2 = df2.drop( \"sum(Species)\")\r\n",
 					"\r\n",
 					"display( df2 )                                     "
 				],
-				"execution_count": 62
+				"execution_count": 89
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}

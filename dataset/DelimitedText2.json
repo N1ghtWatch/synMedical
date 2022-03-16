@@ -1,0 +1,40 @@
+{
+	"name": "DelimitedText2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "asawsmedical-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "iris_union2.csv",
+				"fileSystem": "irisdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Sepal.Length",
+				"type": "String"
+			},
+			{
+				"name": "Sepal.Width",
+				"type": "String"
+			},
+			{
+				"name": "Petal.Length",
+				"type": "String"
+			},
+			{
+				"name": "Petal.Width",
+				"type": "String"
+			}
+		]
+	}
+}

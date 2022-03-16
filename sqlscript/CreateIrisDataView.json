@@ -1,0 +1,17 @@
+{
+	"name": "CreateIrisDataView",
+	"properties": {
+		"content": {
+			"query": "Use dbIris\nGo\n\ndrop view irisdata\ngo \n\nCreate view irisdata as (\nSELECT [Sepal_Length]\n,[Sepal_Width]\n,[Petal_Length]\n,[Petal_Width]\n,[Species]\n FROM [default].[dbo].[irisdata] where [Petal_Length] < 50 )",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dbIris",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

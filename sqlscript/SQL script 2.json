@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "-- This is auto-generated code\nALTER VIEW dailycost as ()\nSELECT\n    DISTINCT * , RIGHT( InstanceId, CHARINDEX( '/', REVERSE( InstanceId ) ) - 1 ) [Resource]\nFROM\n    OPENROWSET(\n        BULK 'https://sac7a.dfs.core.windows.net/conc7a/CostManagement/**',\n        FORMAT = 'CSV', HEADER_ROW = TRUE\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n)",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

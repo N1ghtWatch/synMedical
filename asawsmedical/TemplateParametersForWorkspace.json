@@ -8,10 +8,10 @@
 		"AzureSqlDatabase1_connectionString": {
 			"value": ""
 		},
-		"asawsmedical-WorkspaceDefaultSqlServer_connectionString": {
+		"AzureSqlDatabase2_connectionString": {
 			"value": ""
 		},
-		"AzureSqlDatabase2_connectionString": {
+		"asawsmedical-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
 		"asawsmedical-WorkspaceDefaultStorage_properties_typeProperties_url": {

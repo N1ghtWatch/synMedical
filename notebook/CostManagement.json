@@ -1,0 +1,92 @@
+{
+	"name": "CostManagement",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "spMedical",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "a064f4d6-61cf-4146-aea3-f85111dd6e1e"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Synapse/workspaces/asawsmedical/bigDataPools/spMedical",
+				"name": "spMedical",
+				"type": "Spark",
+				"endpoint": "https://asawsmedical.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spMedical",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"df = spark.read.load('abfss://conc7a@sac7a.dfs.core.windows.net/CostManagement/DailyExport/**', format='csv'\r\n",
+					"## If header exists uncomment line below\r\n",
+					", header=True\r\n",
+					")\r\n",
+					"\r\n",
+					"##display(df.limit(10))"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.withColumn(\"PreTaxCost\",df.PreTaxCost.cast('double')). \\\r\n",
+					"    withColumn(\"UsageDateTime\",df.UsageDateTime.cast('date')). \\\r\n",
+					"    write.mode(\"overwrite\").saveAsTable(\"costmanagement\")"
+				],
+				"execution_count": 22
+			}
+		]
+	}
+}

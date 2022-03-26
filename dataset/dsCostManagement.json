@@ -1,5 +1,5 @@
 {
-	"name": "DelimitedText3",
+	"name": "dsCostManagement",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "asawsmedical-WorkspaceDefaultStorage",

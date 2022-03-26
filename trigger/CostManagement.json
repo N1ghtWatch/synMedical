@@ -1,0 +1,25 @@
+{
+	"name": "CostManagement",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "CostManagement",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/conc7a/blobs/CostManagement/DailyExport",
+			"blobPathEndsWith": "CostManagement/DailyExport",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Storage/storageAccounts/sac7a",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

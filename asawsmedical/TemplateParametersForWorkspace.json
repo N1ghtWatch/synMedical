@@ -16,9 +16,6 @@
 		},
 		"asawsmedical-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://sac7a.dfs.core.windows.net"
-		},
-		"CostManagement_properties_typeProperties_scope": {
-			"value": "/subscriptions/6a4ac82e-930e-4e4d-b385-3cc2c61db5c6/resourceGroups/GECO-C7A/providers/Microsoft.Storage/storageAccounts/sac7a"
 		}
 	}
 }

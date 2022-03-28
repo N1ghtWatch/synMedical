@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://api.talentlyft.com",
+			"url": "https://api.talentlyft.com/v2",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		},

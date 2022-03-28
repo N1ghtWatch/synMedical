@@ -1,0 +1,21 @@
+{
+	"name": "Parquet1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "asawsmedical-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "jobs",
+				"folderPath": "Talentlyft",
+				"fileSystem": "conc7a"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

@@ -9,7 +9,7 @@
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous",
 			"authHeaders": {
-				"Bearer": {
+				"Authorization": {
 					"type": "SecureString",
 					"value": "**********"
 				}
